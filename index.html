@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -613,27 +612,58 @@
             loadReportsList();
         });
 
-        // In-memory storage (replaces localStorage due to sandbox restrictions)
-        let reportsDatabase = [];
+        // LocalStorage-based persistent storage
+        const STORAGE_KEY = 'fieldReports';
 
         // Storage functions
         function getAllReports() {
-            return reportsDatabase;
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                console.error('Error loading reports:', e);
+                return [];
+            }
         }
 
         function saveReport(report) {
-            const index = reportsDatabase.findIndex(r => r.id === report.id);
-            if (index >= 0) {
-                reportsDatabase[index] = report;
-            } else {
-                reportsDatabase.push(report);
+            try {
+                let reports = getAllReports();
+                const index = reports.findIndex(r => r.id === report.id);
+                if (index >= 0) {
+                    reports[index] = report;
+                } else {
+                    reports.push(report);
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+                showSaveIndicator();
+            } catch (e) {
+                console.error('Error saving report:', e);
+                alert('Failed to save report. Storage may be full.');
             }
         }
 
         function deleteReport(id) {
             if (confirm('Are you sure you want to delete this report?')) {
-                reportsDatabase = reportsDatabase.filter(r => r.id !== id);
-                loadReportsList();
+                try {
+                    let reports = getAllReports();
+                    reports = reports.filter(r => r.id !== id);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+                    loadReportsList();
+                } catch (e) {
+                    console.error('Error deleting report:', e);
+                    alert('Failed to delete report.');
+                }
+            }
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            if (indicator) {
+                indicator.style.display = 'block';
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 2000);
             }
         }
 
