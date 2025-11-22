@@ -1,1 +1,1858 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Field Credit Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .page-indicator {
+            background: white;
+            padding: 12px;
+            text-align: center;
+            margin: 16px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .form-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .form-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 8px;
+        }
+
+        .horizontal-table {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .horizontal-table table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .horizontal-table th,
+        .horizontal-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .horizontal-table th {
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+        }
+
+        .horizontal-table input {
+            width: 100%;
+            border: none;
+            padding: 4px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 24px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            min-height: 36px;
+        }
+
+        .btn-block {
+            width: 100%;
+            display: block;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 12px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .navigation button {
+            flex: 1;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        td input {
+            width: 100%;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .add-btn {
+            margin-bottom: 20px;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .photo-item {
+            position: relative;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            padding-top: 100%;
+        }
+
+        .photo-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-delete {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .family-member-card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .family-member-card h3 {
+            color: #2563eb;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-list {
+            margin-top: 20px;
+        }
+
+        .report-item {
+            background: white;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-info h3 {
+            color: #2563eb;
+            margin-bottom: 4px;
+        }
+
+        .report-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .gps-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #059669;
+        }
+
+        .auto-save-indicator {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .auto-save-indicator.show {
+            opacity: 1;
+        }
+
+        .no-reports {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-reports h2 {
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .photo-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .required::after {
+            content: ' *';
+            color: #dc2626;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 12px;
+            }
+
+            .form-section {
+                padding: 16px;
+            }
+
+            .horizontal-table {
+                font-size: 14px;
+            }
+
+            .report-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .report-actions {
+                width: 100%;
+            }
+
+            .report-actions button {
+                flex: 1;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Field Reports">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232563eb' width='100' height='100'/><text y='75' font-size='70' fill='white' text-anchor='middle' x='50'>📝</text></svg>">
+</head>
+<body>
+    <div class="header">
+        <h1>Field Credit Report</h1>
+        <div id="headerSubtitle">Management System</div>
+    </div>
+
+    <div class="auto-save-indicator" id="autoSaveIndicator">Saving...</div>
+
+    <div class="container">
+        <!-- HOME PAGE -->
+        <div id="homePage">
+            <button class="btn btn-primary btn-block" onclick="startNewReport()">📝 New Report</button>
+            <div class="report-list" id="reportList"></div>
+        </div>
+
+        <!-- FORM PAGES -->
+        <div id="formPages" class="hidden">
+            <div class="page-indicator" id="pageIndicator">Page 1 of 3</div>
+
+            <!-- PAGE 1: Basic Information -->
+            <div id="page1" class="page">
+                <div class="form-section">
+                    <h2>Basic Information</h2>
+                    <div class="horizontal-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>File No.</th>
+                                    <th>Loan Amount</th>
+                                    <th>Loan Product</th>
+                                    <th>Place of Service</th>
+                                    <th>Origin Place</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" id="fileNo" placeholder="Enter File No." required></td>
+                                    <td><input type="text" id="loanAmount" placeholder="Amount"></td>
+                                    <td><input type="text" id="loanProduct" placeholder="Product"></td>
+                                    <td><input type="text" id="placeOfService" placeholder="Place"></td>
+                                    <td><input type="text" id="originPlace" placeholder="Origin"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Location Details</h2>
+                    <div class="form-group">
+                        <label>State</label>
+                        <input type="text" id="state" placeholder="Enter State">
+                    </div>
+                    <div class="form-group">
+                        <label>District</label>
+                        <input type="text" id="district" placeholder="Enter District">
+                    </div>
+                    <div class="form-group">
+                        <label>Village Name</label>
+                        <input type="text" id="villageName" placeholder="Enter Village Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Post Office</label>
+                        <input type="text" id="postOffice" placeholder="Enter Post Office">
+                    </div>
+                    <div class="form-group">
+                        <label>Pincode</label>
+                        <input type="text" id="pincode" placeholder="Enter Pincode">
+                    </div>
+                    <div class="form-group">
+                        <label>Tehsil/Taluka</label>
+                        <input type="text" id="tehsil" placeholder="Enter Tehsil/Taluka">
+                    </div>
+                    <div class="form-group">
+                        <label>Nearest Town</label>
+                        <input type="text" id="nearestTown" placeholder="Enter Nearest Town">
+                    </div>
+                    <div class="form-group">
+                        <label>Distance (in kms)</label>
+                        <input type="text" id="distance" placeholder="Enter Distance">
+                    </div>
+                    <div class="form-group">
+                        <label>Nearest Landmark</label>
+                        <input type="text" id="nearestLandmark" placeholder="Enter Nearest Landmark">
+                    </div>
+                    <div class="form-group">
+                        <label>Type of Soil</label>
+                        <input type="text" id="typeOfSoil" placeholder="Enter Type of Soil">
+                    </div>
+                    <div class="form-group">
+                        <label>Soil Conditions</label>
+                        <input type="text" id="soilConditions" placeholder="Enter Soil Conditions">
+                    </div>
+                    <div class="form-group">
+                        <label>Irrigation Facilities</label>
+                        <input type="text" id="irrigationFacilities" placeholder="Enter Irrigation Facilities">
+                    </div>
+                    <div class="form-group">
+                        <label>Rainfall</label>
+                        <input type="text" id="rainfall" placeholder="Enter Rainfall">
+                    </div>
+                    <div class="form-group">
+                        <label>Village Topography</label>
+                        <input type="text" id="villageTopography" placeholder="Enter Village Topography">
+                    </div>
+                    <div class="form-group">
+                        <label>Ground Water Level</label>
+                        <input type="text" id="groundWaterLevel" placeholder="Enter Ground Water Level">
+                    </div>
+                    <div class="form-group">
+                        <label>Proximity to River</label>
+                        <input type="text" id="proximityToRiver" placeholder="Enter Proximity to River">
+                    </div>
+                    <div class="form-group">
+                        <label>Threat To Land</label>
+                        <input type="text" id="threatToLand" placeholder="Enter Threat To Land">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn gps-button btn-block" onclick="captureGPS()">📍 Capture GPS Location</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Latitude</label>
+                        <input type="text" id="lat" placeholder="Auto-filled via GPS">
+                    </div>
+                    <div class="form-group">
+                        <label>Longitude</label>
+                        <input type="text" id="lng" placeholder="Auto-filled via GPS">
+                    </div>
+                    <div class="form-group">
+                        <label>Site Remarks</label>
+                        <textarea id="siteRemarks" placeholder="Enter Site Remarks"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Property Remarks</label>
+                        <textarea id="propertyRemarks" placeholder="Enter Property Remarks"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 2: Crops, Assets & Photos -->
+            <div id="page2" class="page hidden">
+                <div class="form-section">
+                    <h2>Crops Details</h2>
+                    <button class="btn btn-primary add-btn" onclick="addCrop()">➕ Add Crop</button>
+                    <div class="table-container">
+                        <table id="cropsTable">
+                            <thead>
+                                <tr>
+                                    <th>Cultivating Crops</th>
+                                    <th>Acres</th>
+                                    <th>Price (per QTL)</th>
+                                    <th>Yield in Area (per acres)</th>
+                                    <th>Expenses</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cropsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Assets Details</h2>
+                    <button class="btn btn-primary add-btn" onclick="addAsset()">➕ Add Asset</button>
+                    <div class="table-container">
+                        <table id="assetsTable">
+                            <thead>
+                                <tr>
+                                    <th>Asset Numbers</th>
+                                    <th>Present Value</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Photos</h2>
+                    <div class="photo-buttons">
+                        <button class="btn btn-primary" onclick="capturePhoto()">📷 Capture Photo</button>
+                        <button class="btn btn-secondary" onclick="uploadFromGallery()">🖼️ Upload from Gallery</button>
+                    </div>
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handlePhotoCapture(event)">
+                    <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryUpload(event)">
+                    <div class="photo-grid" id="photoGrid"></div>
+                </div>
+            </div>
+
+            <!-- PAGE 3: Family Details -->
+            <div id="page3" class="page hidden">
+                <div class="form-section">
+                    <h2>Family Details</h2>
+                    <button class="btn btn-primary add-btn" onclick="addFamilyMember()">➕ Add Family Member</button>
+                    <div id="familyMembersContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation hidden" id="navigation">
+        <button class="btn btn-secondary" id="prevBtn" onclick="previousPage()" disabled>← Previous</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="nextPage()">Save &amp; Next →</button>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentReportId = null;
+        let autoSaveInterval = null;
+        let photos = [];
+        let crops = [];
+        let assets = [];
+        let familyMembers = [];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadReportsList();
+        });
+
+        // IndexedDB Storage (50-100+ MB capacity)
+        const DB_NAME = 'FieldReportsDB';
+        const DB_VERSION = 2;
+        const STORE_NAME = 'reports';
+        const PHOTO_STORE = 'photos';
+        let db = null;
+
+        // Initialize IndexedDB
+        async function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains(PHOTO_STORE)) {
+                        db.createObjectStore(PHOTO_STORE, { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        // Storage functions
+        async function getAllReports() {
+            if (!db) await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.getAll();
+
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function saveReport(report) {
+            if (!db) await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put(report);
+
+                request.onsuccess = () => {
+                    showSaveIndicator();
+                    resolve();
+                };
+                request.onerror = () => {
+                    console.error('Error saving report:', request.error);
+                    alert('Failed to save report.');
+                    reject(request.error);
+                };
+            });
+        }
+
+        async function deleteReport(id) {
+            if (!confirm('Are you sure you want to delete this report?')) return;
+
+            if (!db) await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(id);
+
+                request.onsuccess = () => {
+                    loadReportsList();
+                    resolve();
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            if (indicator) {
+                indicator.style.display = 'block';
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        // Photo compression function
+        function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Calculate new dimensions
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height *= maxWidth / width;
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width *= maxHeight / height;
+                                height = maxHeight;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convert to base64 with compression
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedDataUrl);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        
+// --- Photo storage helpers (store each photo separately to avoid per-object size limits) ---
+async function photoPut(photoId, dataUrl) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const r = await initDB();
+            const tx = r.transaction([STORE_NAME, PHOTO_STORE], 'readwrite');
+            const store = tx.objectStore(PHOTO_STORE);
+            store.put({ id: photoId, data: dataUrl });
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+        } catch (e) { reject(e); }
+    });
+}
+async function photoGet(photoId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const r = await initDB();
+            const tx = r.transaction([PHOTO_STORE], 'readonly');
+            const store = tx.objectStore(PHOTO_STORE);
+            const req = store.get(photoId);
+            req.onsuccess = () => resolve(req.result ? req.result.data : null);
+            req.onerror = (e) => reject(e.target.error);
+        } catch (e) { reject(e); }
+    });
+}
+async function photoDelete(photoId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const r = await initDB();
+            const tx = r.transaction([PHOTO_STORE], 'readwrite');
+            const store = tx.objectStore(PHOTO_STORE);
+            store.delete(photoId);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+        } catch (e) { reject(e); }
+    });
+}
+async function photoGetMany(photoIds) {
+    // returns array of dataUrls in same order (null if missing)
+    const out = [];
+    for (let id of photoIds || []) {
+        out.push(await photoGet(id));
+    }
+    return out;
+}
+
+        // UI functions
+        function showHomePage() {
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('formPages').classList.add('hidden');
+            document.getElementById('navigation').classList.add('hidden');
+            stopAutoSave();
+        }
+
+        function showFormPages() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('formPages').classList.remove('hidden');
+            document.getElementById('navigation').classList.remove('hidden');
+            startAutoSave();
+        }
+
+        function startNewReport() {
+            currentReportId = 'report_' + Date.now();
+            currentPage = 1;
+            clearForm();
+            showFormPages();
+            showPage(1);
+        }
+
+        function clearForm() {
+            document.querySelectorAll('input, textarea').forEach(field => {
+                if (field.type !== 'file') {
+                    field.value = '';
+                }
+            });
+            photos = [];
+            crops = [];
+            assets = [];
+            familyMembers = [];
+            document.getElementById('cropsTableBody').innerHTML = '';
+            document.getElementById('assetsTableBody').innerHTML = '';
+            document.getElementById('photoGrid').innerHTML = '';
+            document.getElementById('familyMembersContainer').innerHTML = '';
+        }
+
+        async function loadReportsList() {
+            const reports = await getAllReports();
+            const reportList = document.getElementById('reportList');
+            
+            if (reports.length === 0) {
+                reportList.innerHTML = '<div class="no-reports"><h2>No reports created yet</h2><p>Click "New Report" to get started</p></div>';
+                return;
+            }
+
+            reportList.innerHTML = reports.map(report => `
+                <div class="report-item">
+                    <div class="report-info">
+                        <h3>File No: ${report.data.fileNo || 'N/A'}</h3>
+                        <p>Loan Amount: ${report.data.loanAmount || 'N/A'} | Date: ${new Date(report.date).toLocaleDateString()}</p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn btn-primary btn-small" onclick="editReport('${report.id}')">Edit</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteReport('${report.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function editReport(id) {
+            const reports = await getAllReports();
+            const report = reports.find(r => r.id === id);
+            if (!report) return;
+
+            currentReportId = id;
+            loadReportData(report.data);
+            showFormPages();
+            showPage(1);
+        }
+
+        function loadReportData(data) {
+            // Load basic info
+            Object.keys(data).forEach(key => {
+                const field = document.getElementById(key);
+                if (field && typeof data[key] !== 'object') {
+                    field.value = data[key] || '';
+                }
+            });
+
+            // Load crops
+            crops = data.crops || [];
+            document.getElementById('cropsTableBody').innerHTML = '';
+            crops.forEach((crop, index) => {
+                addCrop();
+                document.getElementById(`crop_name_${index}`).value = crop.name || '';
+                document.getElementById(`crop_acres_${index}`).value = crop.acres || '';
+                document.getElementById(`crop_price_${index}`).value = crop.price || '';
+                document.getElementById(`crop_yield_${index}`).value = crop.yield || '';
+                document.getElementById(`crop_expenses_${index}`).value = crop.expenses || '';
+            });
+
+            // Load assets
+            assets = data.assets || [];
+            document.getElementById('assetsTableBody').innerHTML = '';
+            assets.forEach((asset, index) => {
+                addAsset();
+                document.getElementById(`asset_number_${index}`).value = asset.number || '';
+                document.getElementById(`asset_value_${index}`).value = asset.value || '';
+                document.getElementById(`asset_description_${index}`).value = asset.description || '';
+            });
+
+
+            // Load photos
+            photos = data.photos || [];
+            // Migration: if photos are data URLs (old format), move them into photos store and replace with ids
+            (async function migratePhotosIfNeeded() {
+                let changed = false;
+                for (let i = 0; i < photos.length; i++) {
+                    const p = photos[i];
+                    if (typeof p === 'string' && p.startsWith('data:')) {
+                        // save to photo store
+                        const pid = 'photo_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+                        try {
+                            await photoPut(pid, p);
+                            photos[i] = pid;
+                            changed = true;
+                        } catch(e){ console.error('migration failed', e); }
+                        // small delay to ensure unique timestamp
+                        await new Promise(res => setTimeout(res, 10));
+                    }
+                }
+                if (changed && currentReportId) {
+                    // save migrated report (update report to reference photo IDs)
+                    await saveCurrentData();
+                }
+                await renderPhotos();
+            })();
+
+
+            // Load family members
+            familyMembers = data.familyMembers || [];
+            document.getElementById('familyMembersContainer').innerHTML = '';
+            familyMembers.forEach((member, index) => {
+                addFamilyMember();
+                Object.keys(member).forEach(key => {
+                    const field = document.getElementById(`family_${key}_${index}`);
+                    if (field) field.value = member[key] || '';
+                });
+            });
+        }
+
+        function showPage(pageNum) {
+            currentPage = pageNum;
+            
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
+            
+            // Show current page
+            document.getElementById('page' + pageNum).classList.remove('hidden');
+            
+            // Update page indicator
+            document.getElementById('pageIndicator').textContent = `Page ${pageNum} of 3`;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = pageNum === 1;
+            
+            const nextBtn = document.getElementById('nextBtn');
+            if (pageNum === 3) {
+                nextBtn.textContent = 'Submit';
+                nextBtn.className = 'btn btn-primary';
+            } else {
+                nextBtn.textContent = 'Save & Next →';
+                nextBtn.className = 'btn btn-primary';
+            }
+            
+            // Validate File No on page 1
+            if (pageNum === 1) {
+                validatePage1();
+                document.getElementById('fileNo').addEventListener('input', validatePage1);
+            }
+        }
+
+        function validatePage1() {
+            const fileNo = document.getElementById('fileNo').value.trim();
+            document.getElementById('nextBtn').disabled = !fileNo;
+        }
+
+        function nextPage() {
+            if (currentPage === 3) {
+                submitReport();
+            } else {
+                saveCurrentData();
+                showPage(currentPage + 1);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                saveCurrentData();
+                showPage(currentPage - 1);
+            }
+        }
+
+        function saveCurrentData() {
+            const data = collectFormData();
+            const report = {
+                id: currentReportId,
+                date: Date.now(),
+                data: data
+            };
+            saveReport(report);
+            showAutoSaveIndicator();
+        }
+
+        function collectFormData() {
+            const data = {
+                fileNo: document.getElementById('fileNo').value,
+                loanAmount: document.getElementById('loanAmount').value,
+                loanProduct: document.getElementById('loanProduct').value,
+                placeOfService: document.getElementById('placeOfService').value,
+                originPlace: document.getElementById('originPlace').value,
+                state: document.getElementById('state').value,
+                district: document.getElementById('district').value,
+                villageName: document.getElementById('villageName').value,
+                postOffice: document.getElementById('postOffice').value,
+                pincode: document.getElementById('pincode').value,
+                tehsil: document.getElementById('tehsil').value,
+                nearestTown: document.getElementById('nearestTown').value,
+                distance: document.getElementById('distance').value,
+                nearestLandmark: document.getElementById('nearestLandmark').value,
+                typeOfSoil: document.getElementById('typeOfSoil').value,
+                soilConditions: document.getElementById('soilConditions').value,
+                irrigationFacilities: document.getElementById('irrigationFacilities').value,
+                rainfall: document.getElementById('rainfall').value,
+                villageTopography: document.getElementById('villageTopography').value,
+                groundWaterLevel: document.getElementById('groundWaterLevel').value,
+                proximityToRiver: document.getElementById('proximityToRiver').value,
+                threatToLand: document.getElementById('threatToLand').value,
+                lat: document.getElementById('lat').value,
+                lng: document.getElementById('lng').value,
+                siteRemarks: document.getElementById('siteRemarks').value,
+                propertyRemarks: document.getElementById('propertyRemarks').value,
+                crops: collectCrops(),
+                assets: collectAssets(),
+                photos: photos,
+                familyMembers: collectFamilyMembers()
+            };
+            return data;
+        }
+
+        // Auto-save functionality
+        function startAutoSave() {
+            autoSaveInterval = setInterval(() => {
+                saveCurrentData();
+            }, 30000); // 30 seconds
+        }
+
+        function stopAutoSave() {
+            if (autoSaveInterval) {
+                clearInterval(autoSaveInterval);
+                autoSaveInterval = null;
+            }
+        }
+
+        function showAutoSaveIndicator() {
+            const indicator = document.getElementById('autoSaveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // GPS capture
+        function captureGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async position => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        // Fill lat/lng (editable)
+                        document.getElementById('lat').value = lat;
+                        document.getElementById('lng').value = lng;
+
+                        // Reverse geocode using Nominatim (OpenStreetMap)
+                        try {
+                            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`;
+                            const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                            if (!resp.ok) throw new Error('Geocoding API error: ' + resp.status);
+                            const data = await resp.json();
+                            const addr = data.address || {};
+
+                            // Map address fields to your form fields (postOffice intentionally left blank)
+                            const state = addr.state || addr.region || addr.state_district || '';
+                            const district = addr.county || addr.region || addr.suburb || '';
+                            const village = addr.village || addr.town || addr.hamlet || addr.suburb || '';
+                            const postcode = addr.postcode || '';
+
+                            if (state) document.getElementById('state').value = state;
+                            if (district) document.getElementById('district').value = district;
+                            if (village) document.getElementById('villageName').value = village;
+                            // Leave postOffice blank as requested
+                            if (postcode) document.getElementById('pincode').value = postcode;
+
+                            alert('GPS location captured and address fields auto-filled. You can edit them if needed.');
+                        } catch (err) {
+                            console.error(err);
+                            alert('GPS captured but reverse-geocoding failed: ' + err.message + '. You can edit fields manually.');
+                        }
+                    },
+                    error => {
+                        alert('Error capturing GPS: ' + error.message);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser');
+            }
+        }
+
+        // Crops functions
+        function addCrop() {
+            const tbody = document.getElementById('cropsTableBody');
+            const index = tbody.children.length;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" id="crop_name_${index}" placeholder="Crop name"></td>
+                <td><input type="text" id="crop_acres_${index}" placeholder="Acres"></td>
+                <td><input type="text" id="crop_price_${index}" placeholder="Price"></td>
+                <td><input type="text" id="crop_yield_${index}" placeholder="Yield"></td>
+                <td><input type="text" id="crop_expenses_${index}" placeholder="Expenses"></td>
+                <td><button class="btn btn-danger btn-small" onclick="deleteCrop(this)">Delete</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function deleteCrop(btn) {
+            btn.closest('tr').remove();
+        }
+
+        function collectCrops() {
+            const tbody = document.getElementById('cropsTableBody');
+            const crops = [];
+            for (let i = 0; i < tbody.children.length; i++) {
+                crops.push({
+                    name: document.getElementById(`crop_name_${i}`)?.value || '',
+                    acres: document.getElementById(`crop_acres_${i}`)?.value || '',
+                    price: document.getElementById(`crop_price_${i}`)?.value || '',
+                    yield: document.getElementById(`crop_yield_${i}`)?.value || '',
+                    expenses: document.getElementById(`crop_expenses_${i}`)?.value || ''
+                });
+            }
+            return crops;
+        }
+
+        // Assets functions
+        function addAsset() {
+            const tbody = document.getElementById('assetsTableBody');
+            const index = tbody.children.length;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" id="asset_number_${index}" placeholder="Asset number"></td>
+                <td><input type="text" id="asset_value_${index}" placeholder="Value"></td>
+                <td><input type="text" id="asset_description_${index}" placeholder="Description"></td>
+                <td><button class="btn btn-danger btn-small" onclick="deleteAsset(this)">Delete</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function deleteAsset(btn) {
+            btn.closest('tr').remove();
+        }
+
+        function collectAssets() {
+            const tbody = document.getElementById('assetsTableBody');
+            const assets = [];
+            for (let i = 0; i < tbody.children.length; i++) {
+                assets.push({
+                    number: document.getElementById(`asset_number_${i}`)?.value || '',
+                    value: document.getElementById(`asset_value_${i}`)?.value || '',
+                    description: document.getElementById(`asset_description_${i}`)?.value || ''
+                });
+            }
+            return assets;
+        }
+
+        // Photo functions
+        function capturePhoto() {
+            document.getElementById('cameraInput').click();
+        }
+
+        function uploadFromGallery() {
+            document.getElementById('galleryInput').click();
+        }
+
+        function handlePhotoCapture(event) {
+            const files = event.target.files;
+            processPhotoFiles(files);
+        }
+
+        function handleGalleryUpload(event) {
+            const files = event.target.files;
+            processPhotoFiles(files);
+        }
+
+        
+function processPhotoFiles(files) {
+    // max photos allowed
+    const MAX_PHOTOS = 5;
+    const MAX_STORED_PHOTOS = 5;
+    if (photos.length + files.length > MAX_PHOTOS) {
+        alert('Maximum ' + MAX_PHOTOS + ' photos allowed');
+        return;
+    }
+
+    const fileList = Array.from(files).slice(0, MAX_PHOTOS - photos.length);
+
+    // process sequentially to avoid memory spike
+    (async function processSequential() {
+        for (let file of fileList) {
+            try {
+                // If file size is already small, still compress to normalize format
+                const compressed = await compressImage(file, 1200, 1200, 0.7);
+                // estimate size in bytes from base64 length
+                const sizeBytes = Math.ceil((compressed.length - compressed.indexOf(',') - 1) * 3 / 4);
+                // If compressed image still huge (>2MB), try lower quality
+                let finalData = compressed;
+                if (sizeBytes > 2 * 1024 * 1024) {
+                    // try lower quality passes
+                    const qlist = [0.6, 0.5, 0.4];
+                    for (let q of qlist) {
+                        const tmp = await compressImage(file, 1000, 1000, q);
+                        const s = Math.ceil((tmp.length - tmp.indexOf(',') - 1) * 3 / 4);
+                        finalData = tmp;
+                        if (s <= 2 * 1024 * 1024) break;
+                    }
+                }
+                photos.push(finalData);
+                renderPhotos();
+                // save after each image to reduce data loss risk
+                saveCurrentData();
+            } catch (e) {
+                console.error('Error processing image', e);
+                alert('Failed to process one of the images: ' + (e.message || e));
+            }
+        }
+        // final check: if total estimated storage large, warn user
+        try {
+            const estimatedTotal = photos.reduce((acc, p) => acc + Math.ceil((p.length - p.indexOf(',') - 1) * 3 / 4), 0);
+            const mb = (estimatedTotal / (1024*1024)).toFixed(2);
+            if (estimatedTotal > 50 * 1024 * 1024) {
+                alert('Warning: total photos stored ≈ ' + mb + ' MB. This may approach browser storage limits on some devices.');
+            }
+        } catch(e){}
+    })();
+}
+
+
+        
+async function renderPhotos() {
+    const grid = document.getElementById('photoGrid');
+    // photos array now contains photoIds (strings)
+    const items = [];
+    for (let i = 0; i < photos.length; i++) {
+        const p = photos[i];
+        let dataUrl = null;
+        try {
+            // if value already looks like data URL, use it (migration case)
+            if (typeof p === 'string' && p.startsWith('data:')) {
+                dataUrl = p;
+            } else {
+                dataUrl = await photoGet(p);
+            }
+        } catch(e){}
+        items.push({ id: p, data: dataUrl });
+    }
+    grid.innerHTML = items.map((photo, index) => `
+        <div class="photo-item">
+            <img src="${photo.data || ''}" alt="Photo ${index + 1}">
+            <button class="photo-delete" onclick="deletePhoto(${index})">×</button>
+        </div>
+    `).join('');
+}
+
+        
+async function deletePhoto(index) {
+    const pid = photos[index];
+    // remove from array
+    photos.splice(index, 1);
+    // if pid looks like id (not data url), delete from photo store
+    if (typeof pid === 'string' && !pid.startsWith('data:')) {
+        try { await photoDelete(pid); } catch(e){ console.warn('photo delete failed', e); }
+    }
+    await renderPhotos();
+    await saveCurrentData();
+}
+
+        // Family members functions
+        function addFamilyMember() {
+            const container = document.getElementById('familyMembersContainer');
+            const index = container.children.length;
+            const card = document.createElement('div');
+            card.className = 'family-member-card';
+            card.innerHTML = `
+                <h3>
+                    Family Member ${index + 1}
+                    <button class="btn btn-danger btn-small" onclick="deleteFamilyMember(this)">Delete</button>
+                </h3>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="family_name_${index}" placeholder="Enter name">
+                </div>
+                <div class="form-group">
+                    <label>Personal Details</label>
+                    <textarea id="family_personalDetails_${index}" placeholder="Enter personal details"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Education</label>
+                    <input type="text" id="family_education_${index}" placeholder="Enter education">
+                </div>
+                <div class="form-group">
+                    <label>Professional Details</label>
+                    <textarea id="family_professionalDetails_${index}" placeholder="Enter professional details"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Children</label>
+                    <input type="text" id="family_children_${index}" placeholder="Enter children details">
+                </div>
+                <div class="form-group">
+                    <label>Living Standard</label>
+                    <input type="text" id="family_livingStandard_${index}" placeholder="Enter living standard">
+                </div>
+                <div class="form-group">
+                    <label>Remarks</label>
+                    <textarea id="family_remarks_${index}" placeholder="Enter remarks"></textarea>
+                </div>
+            `;
+            container.appendChild(card);
+        }
+
+        function deleteFamilyMember(btn) {
+            btn.closest('.family-member-card').remove();
+        }
+
+        function collectFamilyMembers() {
+            const container = document.getElementById('familyMembersContainer');
+            const members = [];
+            for (let i = 0; i < container.children.length; i++) {
+                members.push({
+                    name: document.getElementById(`family_name_${i}`)?.value || '',
+                    personalDetails: document.getElementById(`family_personalDetails_${i}`)?.value || '',
+                    education: document.getElementById(`family_education_${i}`)?.value || '',
+                    professionalDetails: document.getElementById(`family_professionalDetails_${i}`)?.value || '',
+                    children: document.getElementById(`family_children_${i}`)?.value || '',
+                    livingStandard: document.getElementById(`family_livingStandard_${i}`)?.value || '',
+                    remarks: document.getElementById(`family_remarks_${i}`)?.value || ''
+                });
+            }
+            return members;
+        }
+
+        // Submit and PDF generation
+        function submitReport() {
+            saveCurrentData();
+            generatePDF();
+            showHomePage();
+            loadReportsList();
+            alert('Report submitted successfully!');
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const data = collectFormData();
+            
+            let yPos = 20;
+            const margin = 20;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const contentWidth = pageWidth - 2 * margin;
+
+            // Title
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('Field Credit Report', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 10;
+
+            // Date and File No
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, margin, yPos);
+            doc.text(`File No: ${data.fileNo}`, pageWidth - margin, yPos, { align: 'right' });
+            yPos += 10;
+
+            // Horizontal table
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            const colWidth = contentWidth / 5;
+            const startX = margin;
+            
+            // Headers
+            doc.rect(startX, yPos, contentWidth, 8);
+            doc.text('File No.', startX + 2, yPos + 5);
+            doc.text('Loan Amount', startX + colWidth + 2, yPos + 5);
+            doc.text('Loan Product', startX + colWidth * 2 + 2, yPos + 5);
+            doc.text('Place of Service', startX + colWidth * 3 + 2, yPos + 5);
+            doc.text('Origin Place', startX + colWidth * 4 + 2, yPos + 5);
+            yPos += 8;
+
+            // Values
+            doc.setFont(undefined, 'normal');
+            doc.rect(startX, yPos, contentWidth, 8);
+            doc.text(data.fileNo || '', startX + 2, yPos + 5);
+            doc.text(data.loanAmount || '', startX + colWidth + 2, yPos + 5);
+            doc.text(data.loanProduct || '', startX + colWidth * 2 + 2, yPos + 5);
+            doc.text(data.placeOfService || '', startX + colWidth * 3 + 2, yPos + 5);
+            doc.text(data.originPlace || '', startX + colWidth * 4 + 2, yPos + 5);
+            yPos += 15;
+
+            // Location Details
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Location Details', margin, yPos);
+            yPos += 7;
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+
+            const fields = [
+                ['State', data.state],
+                ['District', data.district],
+                ['Village Name', data.villageName],
+                ['Post Office', data.postOffice],
+                ['Pincode', data.pincode],
+                ['Tehsil/Taluka', data.tehsil],
+                ['Nearest Town', data.nearestTown],
+                ['Distance (in kms)', data.distance],
+                ['Nearest Landmark', data.nearestLandmark],
+                ['Type of Soil', data.typeOfSoil],
+                ['Soil Conditions', data.soilConditions],
+                ['Irrigation Facilities', data.irrigationFacilities],
+                ['Rainfall', data.rainfall],
+                ['Village Topography', data.villageTopography],
+                ['Ground Water Level', data.groundWaterLevel],
+                ['Proximity to River', data.proximityToRiver],
+                ['Threat To Land', data.threatToLand],
+                ['Latitude', data.lat],
+                ['Longitude', data.lng],
+                ['Site Remarks', data.siteRemarks],
+                ['Property Remarks', data.propertyRemarks]
+            ];
+
+            fields.forEach(([label, value]) => {
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                doc.setFont(undefined, 'bold');
+                doc.text(label + ':', margin, yPos);
+                doc.setFont(undefined, 'normal');
+                const textValue = value || '';
+                const maxFieldWidth = contentWidth - 60; // leave space for label
+                const lines = doc.splitTextToSize(textValue, maxFieldWidth);
+                doc.text(lines, margin + 50, yPos);
+                yPos += Math.max(6, lines.length * 5);
+            });
+
+            // Page 2: Crops, Assets & Photos
+            doc.addPage();
+            yPos = 20;
+
+            // Crops
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Crops Details', margin, yPos);
+            yPos += 10;
+
+            if (data.crops && data.crops.length > 0) {
+                doc.setFontSize(8);
+                const cropHeaders = ['Cultivating Crops', 'Acres', 'Price (per QTL)', 'Yield (per acres)', 'Expenses'];
+                const cropColWidth = contentWidth / 5;
+                
+                doc.setFont(undefined, 'bold');
+                cropHeaders.forEach((header, i) => {
+                    doc.text(header, margin + i * cropColWidth, yPos);
+                });
+                yPos += 5;
+
+                doc.setFont(undefined, 'normal');
+                data.crops.forEach(crop => {
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    doc.text(crop.name || '', margin, yPos);
+                    doc.text(crop.acres || '', margin + cropColWidth, yPos);
+                    doc.text(crop.price || '', margin + cropColWidth * 2, yPos);
+                    doc.text(crop.yield || '', margin + cropColWidth * 3, yPos);
+                    doc.text(crop.expenses || '', margin + cropColWidth * 4, yPos);
+                    yPos += 6;
+                });
+            } else {
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+                doc.text('No crops data', margin, yPos);
+            }
+            yPos += 10;
+
+            // Assets
+            if (yPos > 250) {
+                doc.addPage();
+                yPos = 20;
+            }
+
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Assets Details', margin, yPos);
+            yPos += 10;
+
+            if (data.assets && data.assets.length > 0) {
+                doc.setFontSize(8);
+                const assetHeaders = ['Asset Numbers', 'Present Value', 'Description'];
+                const assetColWidth = contentWidth / 3;
+                
+                doc.setFont(undefined, 'bold');
+                assetHeaders.forEach((header, i) => {
+                    doc.text(header, margin + i * assetColWidth, yPos);
+                });
+                yPos += 5;
+
+                doc.setFont(undefined, 'normal');
+                data.assets.forEach(asset => {
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    doc.text(asset.number || '', margin, yPos);
+                    doc.text(asset.value || '', margin + assetColWidth, yPos);
+                    doc.text(asset.description || '', margin + assetColWidth * 2, yPos);
+                    yPos += 6;
+                });
+            } else {
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+                doc.text('No assets data', margin, yPos);
+            }
+            yPos += 10;
+
+            // Photos
+            if (data.photos && data.photos.length > 0) {
+                if (yPos > 200) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('Photos', margin, yPos);
+                yPos += 10;
+
+                const photoWidth = 80;
+                const photoHeight = 60;
+                const photosPerRow = 2;
+                let photoCount = 0;
+
+                data.photos.forEach((photo, index) => {
+                    if (yPos + photoHeight > 280) {
+                        doc.addPage();
+                        yPos = 20;
+                        photoCount = 0;
+                    }
+
+                    const xPos = margin + (photoCount % photosPerRow) * (photoWidth + 10);
+                    try {
+                        doc.addImage(photo, 'JPEG', xPos, yPos, photoWidth, photoHeight);
+                    } catch (e) {
+                        console.error('Error adding image:', e);
+                    }
+
+                    photoCount++;
+                    if (photoCount % photosPerRow === 0) {
+                        yPos += photoHeight + 10;
+                    }
+                });
+
+                if (photoCount % photosPerRow !== 0) {
+                    yPos += photoHeight + 10;
+                }
+            }
+
+            // Page 3: Family Details
+            doc.addPage();
+            yPos = 20;
+
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Family Details', margin, yPos);
+            yPos += 10;
+
+            if (data.familyMembers && data.familyMembers.length > 0) {
+                data.familyMembers.forEach((member, index) => {
+                    if (yPos > 250) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Family Member ${index + 1}`, margin, yPos);
+                    yPos += 7;
+
+                    doc.setFontSize(9);
+                    const memberFields = [
+                        ['Name', member.name],
+                        ['Personal Details', member.personalDetails],
+                        ['Education', member.education],
+                        ['Professional Details', member.professionalDetails],
+                        ['Children', member.children],
+                        ['Living Standard', member.livingStandard],
+                        ['Remarks', member.remarks]
+                    ];
+
+                    memberFields.forEach(([label, value]) => {
+                        if (yPos > 270) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                        doc.setFont(undefined, 'bold');
+                        doc.text(label + ':', margin + 5, yPos);
+                        doc.setFont(undefined, 'normal');
+                        const textValue = value || '';
+                        const lines = doc.splitTextToSize(textValue, contentWidth - 60);
+                        doc.text(lines, margin + 60, yPos);
+                        yPos += Math.max(6, lines.length * 5);
+                    });
+
+                    yPos += 5;
+                });
+            } else {
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+                doc.text('No family members data', margin, yPos);
+            }
+
+            // Save PDF
+            doc.save(`Field_Report_${data.fileNo || 'draft'}_${Date.now()}.pdf`);
+        }
+    </script>
+
+<script>
+// IndexedDB wrapper for Field Reports
+const DB_NAME = 'FieldReportsDB';
+const STORE_NAME = 'reports';
+let dbInstance = null;
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        if (dbInstance) return resolve(dbInstance);
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = function(e) {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+        };
+        req.onsuccess = function(e) {
+            dbInstance = e.target.result;
+            resolve(dbInstance);
+        };
+        req.onerror = function(e) {
+            reject(e.target.error);
+        };
+    });
+}
+
+async function dbPut(report) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.put(report);
+        tx.oncomplete = () => resolve();
+        tx.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function dbGetAll() {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function dbGetById(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(id);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function dbDelete(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function dbGetByFileNo(fileNo) {
+    const all = await dbGetAll();
+    return all.find(r => (r.data && String(r.data.fileNo || '') === String(fileNo)));
+}
+
+// Override storage functions to use IndexedDB
+async function getAllReports() {
+    const list = await dbGetAll();
+    // sort by date descending
+    return list.sort((a,b) => b.date - a.date);
+}
+
+async function saveReport(report) {
+    if (!report.id) report.id = 'report_' + Date.now();
+    report.date = report.date || Date.now();
+    await dbPut(report);
+}
+
+async function deleteReport(id) {
+    if (!confirm('Are you sure you want to delete this report?')) return;
+    await dbDelete(id);
+    await loadReportsList();
+}
+
+// Override loadReportsList to render from DB and add search UI
+async function loadReportsList() {
+    const reports = await getAllReports();
+    const reportList = document.getElementById('reportList');
+    if (!reports || reports.length === 0) {
+        reportList.innerHTML = '<div class="no-reports"><h2>No reports saved yet</h2><p>Click \"New Report\" to get started</p></div>';
+        return;
+    }
+    reportList.innerHTML = reports.map(report => `
+        <div class="report-item">
+            <div class="report-info">
+                <h3>File No: ${report.data.fileNo || 'N/A'}</h3>
+                <p>Loan Amount: ${report.data.loanAmount || 'N/A'} | Date: ${new Date(report.date).toLocaleString()}</p>
+            </div>
+            <div class="report-actions">
+                <button class="btn btn-primary btn-small" onclick="editReport('${report.id}')">Edit</button>
+                <button class="btn btn-primary btn-small" onclick="downloadReport('${report.id}')">Download PDF</button>
+                <button class="btn btn-danger btn-small" onclick="deleteReport('${report.id}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Ensure there's a search bar in home page
+const found = await dbGetByFileNo(v);
+        const reportList = document.getElementById('reportList');
+        if (!found) {
+            reportList.innerHTML = '<div class="no-reports"><h2>No matching report found</h2></div>';
+            return;
+        }
+        reportList.innerHTML = `
+            <div class="report-item">
+                <div class="report-info">
+                    <h3>File No: ${found.data.fileNo || 'N/A'}</h3>
+                    <p>Loan Amount: ${found.data.loanAmount || 'N/A'} | Date: ${new Date(found.date).toLocaleString()}</p>
+                </div>
+                <div class="report-actions">
+                    <button class="btn btn-primary btn-small" onclick="editReport('${found.id}')">Edit</button>
+                    <button class="btn btn-primary btn-small" onclick="downloadReport('${found.id}')">Download PDF</button>
+                    <button class="btn btn-danger btn-small" onclick="deleteReport('${found.id}')">Delete</button>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById('refreshBtn').addEventListener('click', loadReportsList);
+}
+
+// Save current data into DB (override)
+async function saveCurrentData() {
+    const data = collectFormData();
+    const report = {
+        id: currentReportId || ('report_' + Date.now()),
+        date: Date.now(),
+        data: data
+    };
+    await saveReport(report);
+    currentReportId = report.id;
+    showAutoSaveIndicator();
+    await loadReportsList();
+}
+
+// Edit existing report: load from DB
+async function editReport(id) {
+    const report = await dbGetById(id);
+    if (!report) return;
+    currentReportId = id;
+    loadReportData(report.data);
+    showFormPages();
+    showPage(1);
+}
+
+// Download PDF for a saved report by loading it into form then generating PDF
+async function downloadReport(id) {
+    const report = await dbGetById(id);
+    if (!report) return alert('Report not found');
+    // load data into form temporarily, generate PDF, then reload current form state
+    const currentState = collectFormData();
+    const wasCurrentId = currentReportId;
+    loadReportData(report.data);
+    // set currentReportId to id so filename includes fileNo
+    currentReportId = id;
+    try {
+        generatePDF(); // uses form values to create PDF download
+    } catch(e) {
+        alert('Error generating PDF: ' + e.message);
+    }
+    // restore previous state
+    loadReportData(currentState);
+    currentReportId = wasCurrentId;
+}
+
+// Initialize DB on load and then load reports list
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await openDB();
+        // small delay to let original app init run
+        setTimeout(() => { loadReportsList(); }, 300);
+    } catch(e) {
+        console.error('DB init error', e);
+    }
+});
+
+        // Initialize DB and load reports on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+                console.log('IndexedDB initialized successfully');
+                loadReportsList();
+            } catch (error) {
+                console.error('Failed to initialize database:', error);
+                alert('Failed to initialize storage. Please check browser settings.');
+            }
+        });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
+    </script>
+
+</body>
+</html>
