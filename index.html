@@ -2009,6 +2009,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Village Topography
     addRadios("villageTopography", ["Hilly", "Plain"]);
+function restoreRadio(inputId) {
+    const inp = document.getElementById(inputId);
+    if (!inp || !inp.value) return;
+    const radios = document.getElementsByName(inputId + "_radio");
+    radios.forEach(r => { if (r.value === inp.value) r.checked = true; });
+}
+restoreRadio("typeOfSoil");
+restoreRadio("soilConditions");
+restoreRadio("rainfall");
+restoreRadio("villageTopography");
+
 });
 </script>
 
