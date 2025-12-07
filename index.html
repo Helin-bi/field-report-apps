@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Field Credit Report</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Field Credit Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -388,230 +389,238 @@
             display: none;
         }
     </style>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Field Reports">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232563eb' width='100' height='100'/><text y='75' font-size='70' fill='white' text-anchor='middle' x='50'>📝</text></svg>">
+<link href="manifest.json" rel="manifest"/>
+<meta content="#2563eb" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="Field Reports" name="apple-mobile-web-app-title"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect fill='%232563eb' width='100' height='100'/&gt;&lt;text y='75' font-size='70' fill='white' text-anchor='middle' x='50'&gt;📝&lt;/text&gt;&lt;/svg&gt;" rel="apple-touch-icon"/>
+<style>
+.toggle-group{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.toggle-btn{padding:8px 14px;border:1px solid #cbd5e1;border-radius:8px;background:#e6eefb;cursor:pointer;font-weight:600;}
+.toggle-btn.active{background:#2563eb;color:white;border-color:#1e40af;}
+</style>
+<script>
+function initToggles(){
+ document.querySelectorAll('.toggle-group').forEach(g=>{
+    let id = g.dataset.target;
+    let input = document.getElementById(id);
+    g.querySelectorAll('.toggle-btn').forEach(btn=>{
+        btn.onclick = () => {
+            g.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            input.value = btn.dataset.value;
+        };
+        if(input.value === btn.dataset.value) btn.classList.add('active');
+    });
+ });
+}
+document.addEventListener('DOMContentLoaded', initToggles);
+</script>
 </head>
 <body>
-    <div class="header">
-        <h1>Field Credit Report</h1>
-        <div id="headerSubtitle">Management System</div>
-    </div>
-
-    <div class="auto-save-indicator" id="autoSaveIndicator">Saving...</div>
-
-    
-    
+<div class="header">
+<h1>Field Credit Report</h1>
+<div id="headerSubtitle">Management System</div>
+</div>
+<div class="auto-save-indicator" id="autoSaveIndicator">Saving...</div>
 <div class="container">
-        <!-- HOME PAGE -->
-        <div id="homePage">
-            <button class="btn btn-primary btn-block" onclick="startNewReport()">📝 New Report</button>
-            <div class="report-list" id="reportList"></div>
-        </div>
-
-        <!-- FORM PAGES -->
-        <div id="formPages" class="hidden">
-        <div id="dateContainer" style="text-align:center; margin-top:10px;">
-            <label style="font-weight:600;">Report Date: </label>
-            <input type="date" id="reportDate" style="padding:6px; border:1px solid #ccc; border-radius:6px;">
-        </div>
-    
-            <div class="page-indicator" id="pageIndicator">Page 1 of 3</div>
-
-            <!-- PAGE 1: Basic Information -->
-            <div id="page1" class="page">
-                <div class="form-section">
-                    <h2>Basic Information</h2>
-                    <div class="horizontal-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>File No.</th>
-                                    <th>Loan Amount</th>
-                                    <th>Loan Product</th>
-                                    <th>Place of Service</th>
-                                    <th>Origin Place</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input type="text" id="fileNo" placeholder="Enter File No." required></td>
-                                    <td><input type="text" id="loanAmount" placeholder="Amount"></td>
-                                    <td><input type="text" id="loanProduct" placeholder="Product"></td>
-                                    <td><input type="text" id="placeOfService" placeholder="Place"></td>
-                                    <td><input type="text" id="originPlace" placeholder="Origin"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h2>Location Details</h2>
-                    <div class="form-group">
-                        <label>State</label>
-                        <input type="text" id="state" placeholder="Enter State">
-                    </div>
-                    <div class="form-group">
-                        <label>District</label>
-                        <input type="text" id="district" placeholder="Enter District">
-                    </div>
-                    <div class="form-group">
-                        <label>Village Name</label>
-                        <input type="text" id="villageName" placeholder="Enter Village Name">
-                    </div>
-                    <div class="form-group">
-                        <label>Post Office</label>
-                        <input type="text" id="postOffice" placeholder="Enter Post Office">
-                    </div>
-                    <div class="form-group">
-                        <label>Pincode</label>
-                        <input type="text" id="pincode" placeholder="Enter Pincode">
-                    </div>
-                    <div class="form-group">
-                        <label>Tehsil/Taluka</label>
-                        <input type="text" id="tehsil" placeholder="Enter Tehsil/Taluka">
-                    </div>
-                    <div class="form-group">
-                        <label>Nearest Town</label>
-                        <input type="text" id="nearestTown" placeholder="Enter Nearest Town">
-                    </div>
-                    <div class="form-group">
-                        <label>Distance (in kms)</label>
-                        <input type="text" id="distance" placeholder="Enter Distance">
-                    </div>
-                    <div class="form-group">
-                        <label>Nearest Landmark</label>
-                        <input type="text" id="nearestLandmark" placeholder="Enter Nearest Landmark">
-                    </div>
-                    <div class="form-group">
-                        <label>Type of Soil</label>
-                        <input type="text" id="typeOfSoil" placeholder="Enter Type of Soil">
-                    </div>
-                    <div class="form-group">
-                        <label>Soil Conditions</label>
-                        <input type="text" id="soilConditions" placeholder="Enter Soil Conditions">
-                    </div>
-                    <div class="form-group">
-                        <label>Irrigation Facilities</label>
-                        <input type="text" id="irrigationFacilities" placeholder="Enter Irrigation Facilities">
-                    </div>
-                    <div class="form-group">
-                        <label>Rainfall</label>
-                        <input type="text" id="rainfall" placeholder="Enter Rainfall">
-                    </div>
-                    <div class="form-group">
-                        <label>Village Topography</label>
-                        <input type="text" id="villageTopography" placeholder="Enter Village Topography">
-                    </div>
-                    <div class="form-group">
-                        <label>Ground Water Level</label>
-                        <input type="text" id="groundWaterLevel" placeholder="Enter Ground Water Level">
-                    </div>
-                    <div class="form-group">
-                        <label>Proximity to River</label>
-                        <input type="text" id="proximityToRiver" placeholder="Enter Proximity to River">
-                    </div>
-                    <div class="form-group">
-                        <label>Threat To Land</label>
-                        <input type="text" id="threatToLand" placeholder="Enter Threat To Land">
-                    </div>
-                    <div class="form-group">
-                        <button class="btn gps-button btn-block" onclick="captureGPS()">📍 Capture GPS Location</button>
-                    </div>
-                    <div class="form-group">
-                        <label>Latitude</label>
-                        <input type="text" id="lat" placeholder="Auto-filled via GPS">
-                    </div>
-                    <div class="form-group">
-                        <label>Longitude</label>
-                        <input type="text" id="lng" placeholder="Auto-filled via GPS">
-                    </div>
-                    <div class="form-group">
-                        <label>Site Remarks</label>
-                        <textarea id="siteRemarks" placeholder="Enter Site Remarks"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Property Remarks</label>
-                        <textarea id="propertyRemarks" placeholder="Enter Property Remarks"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE 2: Crops, Assets & Photos -->
-            <div id="page2" class="page hidden">
-                <div class="form-section">
-                    <h2>Crops Details</h2>
-                    <button class="btn btn-primary add-btn" onclick="addCrop()">➕ Add Crop</button>
-                    <div class="table-container">
-                        <table id="cropsTable">
-                            <thead>
-                                <tr>
-                                    <th>Cultivating Crops</th>
-                                    <th>Acres</th>
-                                    <th>Price (per QTL)</th>
-                                    <th>Yield in Area (per acres)</th>
-                                    <th>Expenses</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cropsTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h2>Assets Details</h2>
-                    <button class="btn btn-primary add-btn" onclick="addAsset()">➕ Add Asset</button>
-                    <div class="table-container">
-                        <table id="assetsTable">
-                            <thead>
-                                <tr>
-                                    <th>Asset Numbers</th>
-                                    <th>Present Value</th>
-                                    <th>Description</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="assetsTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h2>Photos</h2>
-                    <div class="photo-buttons">
-                        <button class="btn btn-primary" onclick="capturePhoto()">📷 Capture Photo</button>
-                        <button class="btn btn-secondary" onclick="uploadFromGallery()">🖼️ Upload from Gallery</button>
-                    </div>
-                    <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handlePhotoCapture(event)">
-                    <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryUpload(event)">
-                    <div class="photo-grid" id="photoGrid"></div>
-                </div>
-            </div>
-
-            <!-- PAGE 3: Family Details -->
-            <div id="page3" class="page hidden">
-                <div class="form-section">
-                    <h2>Family Details</h2>
-                    <button class="btn btn-primary add-btn" onclick="addFamilyMember()">➕ Add Family Member</button>
-                    <div id="familyMembersContainer"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="navigation hidden" id="navigation">
-        <button class="btn btn-secondary" id="prevBtn" onclick="previousPage()" disabled>← Previous</button>
-        <button class="btn btn-primary" id="nextBtn" onclick="nextPage()">Save &amp; Next →</button>
-    </div>
-
-    <script>
+<!-- HOME PAGE -->
+<div id="homePage">
+<button class="btn btn-primary btn-block" onclick="startNewReport()">📝 New Report</button>
+<div class="report-list" id="reportList"></div>
+</div>
+<!-- FORM PAGES -->
+<div class="hidden" id="formPages">
+<div id="dateContainer" style="text-align:center; margin-top:10px;">
+<label style="font-weight:600;">Report Date: </label>
+<input id="reportDate" style="padding:6px; border:1px solid #ccc; border-radius:6px;" type="date"/>
+</div>
+<div class="page-indicator" id="pageIndicator">Page 1 of 3</div>
+<!-- PAGE 1: Basic Information -->
+<div class="page" id="page1">
+<div class="form-section">
+<h2>Basic Information</h2>
+<div class="horizontal-table">
+<table>
+<thead>
+<tr>
+<th>File No.</th>
+<th>Loan Amount</th>
+<th>Loan Product</th>
+<th>Place of Service</th>
+<th>Origin Place</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input id="fileNo" placeholder="Enter File No." required="" type="text"/></td>
+<td><input id="loanAmount" placeholder="Amount" type="text"/></td>
+<td><input id="loanProduct" placeholder="Product" type="text"/></td>
+<td><input id="placeOfService" placeholder="Place" type="text"/></td>
+<td><input id="originPlace" placeholder="Origin" type="text"/></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="form-section">
+<h2>Location Details</h2>
+<div class="form-group">
+<label>State</label>
+<input id="state" placeholder="Enter State" type="text"/>
+</div>
+<div class="form-group">
+<label>District</label>
+<input id="district" placeholder="Enter District" type="text"/>
+</div>
+<div class="form-group">
+<label>Village Name</label>
+<input id="villageName" placeholder="Enter Village Name" type="text"/>
+</div>
+<div class="form-group">
+<label>Post Office</label>
+<input id="postOffice" placeholder="Enter Post Office" type="text"/>
+</div>
+<div class="form-group">
+<label>Pincode</label>
+<input id="pincode" placeholder="Enter Pincode" type="text"/>
+</div>
+<div class="form-group">
+<label>Tehsil/Taluka</label>
+<input id="tehsil" placeholder="Enter Tehsil/Taluka" type="text"/>
+</div>
+<div class="form-group">
+<label>Nearest Town</label>
+<input id="nearestTown" placeholder="Enter Nearest Town" type="text"/>
+</div>
+<div class="form-group">
+<label>Distance (in kms)</label>
+<input id="distance" placeholder="Enter Distance" type="text"/>
+</div>
+<div class="form-group">
+<label>Nearest Landmark</label>
+<input id="nearestLandmark" placeholder="Enter Nearest Landmark" type="text"/>
+</div>
+<div class="form-group">
+<label>Type of Soil</label>
+<input id="typeOfSoil" placeholder="Enter Type of Soil" style="display:none;" type="text"/><div class="toggle-group" data-target="typeOfSoil"><button class="toggle-btn" data-value="Black" type="button">Black</button><button class="toggle-btn" data-value="Sandy" type="button">Sandy</button></div>
+</div>
+<div class="form-group">
+<label>Soil Conditions</label>
+<input id="soilConditions" placeholder="Enter Soil Conditions" style="display:none;" type="text"/><div class="toggle-group" data-target="soilConditions"><button class="toggle-btn" data-value="Fertile" type="button">Fertile</button><button class="toggle-btn" data-value="Infertile" type="button">Infertile</button></div>
+</div>
+<div class="form-group">
+<label>Irrigation Facilities</label>
+<input id="irrigationFacilities" placeholder="Enter Irrigation Facilities" type="text"/>
+</div>
+<div class="form-group">
+<label>Rainfall</label>
+<input id="rainfall" placeholder="Enter Rainfall" style="display:none;" type="text"/><div class="toggle-group" data-target="rainfall"><button class="toggle-btn" data-value="Low" type="button">Low</button><button class="toggle-btn" data-value="Average" type="button">Average</button><button class="toggle-btn" data-value="High" type="button">High</button></div>
+</div>
+<div class="form-group">
+<label>Village Topography</label>
+<input id="villageTopography" placeholder="Enter Village Topography" style="display:none;" type="text"/><div class="toggle-group" data-target="villageTopography"><button class="toggle-btn" data-value="Hilly" type="button">Hilly</button><button class="toggle-btn" data-value="Plain" type="button">Plain</button></div>
+</div>
+<div class="form-group">
+<label>Ground Water Level</label>
+<input id="groundWaterLevel" placeholder="Enter Ground Water Level" type="text"/>
+</div>
+<div class="form-group">
+<label>Proximity to River</label>
+<input id="proximityToRiver" placeholder="Enter Proximity to River" type="text"/>
+</div>
+<div class="form-group">
+<label>Threat To Land</label>
+<input id="threatToLand" placeholder="Enter Threat To Land" type="text"/>
+</div>
+<div class="form-group">
+<button class="btn gps-button btn-block" onclick="captureGPS()">📍 Capture GPS Location</button>
+</div>
+<div class="form-group">
+<label>Latitude</label>
+<input id="lat" placeholder="Auto-filled via GPS" type="text"/>
+</div>
+<div class="form-group">
+<label>Longitude</label>
+<input id="lng" placeholder="Auto-filled via GPS" type="text"/>
+</div>
+<div class="form-group">
+<label>Site Remarks</label>
+<textarea id="siteRemarks" placeholder="Enter Site Remarks"></textarea>
+</div>
+<div class="form-group">
+<label>Property Remarks</label>
+<textarea id="propertyRemarks" placeholder="Enter Property Remarks"></textarea>
+</div>
+</div>
+</div>
+<!-- PAGE 2: Crops, Assets & Photos -->
+<div class="page hidden" id="page2">
+<div class="form-section">
+<h2>Crops Details</h2>
+<button class="btn btn-primary add-btn" onclick="addCrop()">➕ Add Crop</button>
+<div class="table-container">
+<table id="cropsTable">
+<thead>
+<tr>
+<th>Cultivating Crops</th>
+<th>Acres</th>
+<th>Price (per QTL)</th>
+<th>Yield in Area (per acres)</th>
+<th>Expenses</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="cropsTableBody">
+</tbody>
+</table>
+</div>
+</div>
+<div class="form-section">
+<h2>Assets Details</h2>
+<button class="btn btn-primary add-btn" onclick="addAsset()">➕ Add Asset</button>
+<div class="table-container">
+<table id="assetsTable">
+<thead>
+<tr>
+<th>Asset Numbers</th>
+<th>Present Value</th>
+<th>Description</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="assetsTableBody">
+</tbody>
+</table>
+</div>
+</div>
+<div class="form-section">
+<h2>Photos</h2>
+<div class="photo-buttons">
+<button class="btn btn-primary" onclick="capturePhoto()">📷 Capture Photo</button>
+<button class="btn btn-secondary" onclick="uploadFromGallery()">🖼️ Upload from Gallery</button>
+</div>
+<input accept="image/*" capture="environment" id="cameraInput" onchange="handlePhotoCapture(event)" type="file"/>
+<input accept="image/*" id="galleryInput" multiple="" onchange="handleGalleryUpload(event)" type="file"/>
+<div class="photo-grid" id="photoGrid"></div>
+</div>
+</div>
+<!-- PAGE 3: Family Details -->
+<div class="page hidden" id="page3">
+<div class="form-section">
+<h2>Family Details</h2>
+<button class="btn btn-primary add-btn" onclick="addFamilyMember()">➕ Add Family Member</button>
+<div id="familyMembersContainer"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="navigation hidden" id="navigation">
+<button class="btn btn-secondary" disabled="" id="prevBtn" onclick="previousPage()">← Previous</button>
+<button class="btn btn-primary" id="nextBtn" onclick="nextPage()">Save &amp; Next →</button>
+</div>
+<script>
         let currentPage = 1;
         let currentReportId = null;
         let autoSaveInterval = null;
@@ -1671,7 +1680,6 @@ async function deletePhoto(index) {
             doc.save(`Field_Report_${data.fileNo || 'draft'}_${Date.now()}.pdf`);
         }
     </script>
-
 <script>
 // IndexedDB wrapper for Field Reports
 const DB_NAME = 'FieldReportsDB';
@@ -1890,138 +1898,65 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     </script>
 
-
 <script>
-// --- UI Enhancements for Specific Questions ---
+document.addEventListener("DOMContentLoaded", function(){
 
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Helper to wrap box
-    function wrapBox(element) {
-        const box = document.createElement('div');
-        box.style.border = "2px solid #cbd5e1";
-        box.style.padding = "12px";
-        box.style.borderRadius = "8px";
-        box.style.marginTop = "8px";
-        box.style.marginBottom = "16px";
-        element.parentNode.insertBefore(box, element);
-        box.appendChild(element);
-        return box;
-    }
-
-    // ------- 1. Distance Slider (0–30 km) -------
+    // --- Distance Slider (0–30 km) ---
     const dist = document.getElementById('distance');
-    if (dist) {
-        wrapBox(dist.parentElement);
-        const slider = document.createElement('input');
-        slider.type = "range";
-        slider.min = 0;
-        slider.max = 30;
-        slider.value = dist.value || 0;
-        slider.style.width = "100%";
+    if(dist){
+        const wrap = dist.parentElement;
+        dist.style.display="none";
 
-        const label = document.createElement('div');
-        label.style.marginTop = "6px";
-        label.style.fontWeight = "600";
-        label.innerText = slider.value + " km";
+        const slider = document.createElement("input");
+        slider.type="range";
+        slider.min=0;
+        slider.max=30;
+        slider.value = dist.value || 0;
+        slider.style.width="100%";
+
+        const lbl = document.createElement("div");
+        lbl.style.fontWeight="600";
+        lbl.style.marginTop="6px";
+        lbl.innerText = slider.value + " km";
 
         slider.oninput = function(){
-            label.innerText = this.value + " km";
+            lbl.innerText = this.value + " km";
             dist.value = this.value;
         };
 
-        dist.style.display = "none"; 
-        dist.parentElement.appendChild(slider);
-        dist.parentElement.appendChild(label);
+        wrap.appendChild(slider);
+        wrap.appendChild(lbl);
     }
 
-    // ------- 2. Proximity to River Slider (0–5 km in 0.5 steps, show meters) -------
+    // --- Proximity to River slider (0–5 km, step 0.5) ---
     const prox = document.getElementById('proximityToRiver');
-    if (prox) {
-        wrapBox(prox.parentElement);
-        const slider2 = document.createElement('input');
-        slider2.type = "range";
-        slider2.min = 0;
-        slider2.max = 5;
-        slider2.step = 0.5;
-        slider2.value = prox.value || 0;
-        slider2.style.width = "100%";
+    if(prox){
+        const wrap2 = prox.parentElement;
+        prox.style.display="none";
 
-        const label2 = document.createElement('div');
-        label2.style.marginTop = "6px";
-        label2.style.fontWeight = "600";
-        label2.innerText = (slider2.value*1000) + " meters";
+        const slider2 = document.createElement("input");
+        slider2.type="range";
+        slider2.min=0;
+        slider2.max=5;
+        slider2.step=0.5;
+        slider2.value = prox.value ? (prox.value/1000) : 0;
+        slider2.style.width="100%";
+
+        const lbl2 = document.createElement("div");
+        lbl2.style.fontWeight="600";
+        lbl2.style.marginTop="6px";
+        lbl2.innerText = (slider2.value*1000) + " meters";
 
         slider2.oninput = function(){
-            label2.innerText = (this.value*1000) + " meters";
-            prox.value = this.value*1000; 
+            lbl2.innerText = (this.value*1000) + " meters";
+            prox.value = this.value*1000;
         };
 
-        prox.style.display = "none";
-        prox.parentElement.appendChild(slider2);
-        prox.parentElement.appendChild(label2);
+        wrap2.appendChild(slider2);
+        wrap2.appendChild(lbl2);
     }
-
-    // Radio generator
-    function addRadios(inputId, options){
-        const inp = document.getElementById(inputId);
-        if (!inp) return;
-
-        wrapBox(inp.parentElement);
-        inp.style.display = "none";
-
-        const box = document.createElement('div');
-        box.style.marginTop = "10px";
-
-        options.forEach(opt => {
-            const lbl = document.createElement('label');
-            lbl.style.display = "inline-block"; lbl.style.marginRight="20px";
-            lbl.style.marginBottom = "6px";
-
-            const r = document.createElement('input');
-            r.type = "radio";
-            r.name = inputId + "_radio";
-            r.value = opt;
-            r.style.marginRight = "6px";
-
-            if (inp.value === opt) r.checked = true;
-
-            r.onchange = function(){
-                inp.value = this.value;
-            };
-
-            lbl.appendChild(r);
-            lbl.appendChild(document.createTextNode(opt));
-            box.appendChild(lbl);
-        });
-
-        inp.parentElement.appendChild(box);
-    }
-
-    // Soil type
-    addRadios("typeOfSoil", ["Black", "Sandy"]);
-
-    // Soil Conditions
-    addRadios("soilConditions", ["Fertile", "Infertile"]);
-
-    // Rainfall
-    addRadios("rainfall", ["Low", "Average", "High"]);
-
-    // Village Topography
-    addRadios("villageTopography", ["Hilly", "Plain"]);
-function restoreRadio(inputId) {
-    const inp = document.getElementById(inputId);
-    if (!inp || !inp.value) return;
-    const radios = document.getElementsByName(inputId + "_radio");
-    radios.forEach(r => { if (r.value === inp.value) r.checked = true; });
-}
-restoreRadio("typeOfSoil");
-restoreRadio("soilConditions");
-restoreRadio("rainfall");
-restoreRadio("villageTopography");
 
 });
 </script>
-
 </body>
 </html>
